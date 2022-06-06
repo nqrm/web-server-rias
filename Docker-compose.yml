@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  flask-server:
+    container_name: flask-server
+    build:  ./server-producer
+    ports:
+      - "5000:5000"
+    depends_on:
+      - consumer1-app
+      - consumer2-app
+      - consumer3-app
+
+  consumer1-app:
+    container_name: consumer1-container
+    build: ./consumer
+    depends_on:
+      - rabbit
+
+  consumer2-app:
+    container_name: consumer2-container
+    build: ./consumer
+    depends_on:
+      - rabbit
+
+  consumer3-app:
+    container_name: consumer3-container
+    build: ./consumer
+    depends_on:
+      - rabbit
+
+  rabbit:
+    container_name: rabbit_container
+    hostname: rabbit
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    depends_on:
+      - mongodb
+
+  redis:
+    container_name: redis_container
+    image: "redis:alpine"
+
+  mongodb:
+    container_name: mongodb_container
+    hostname: mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
